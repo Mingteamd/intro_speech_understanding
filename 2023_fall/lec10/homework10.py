@@ -1,4 +1,5 @@
 import numpy as np
+import librosa
 
 def waveform_to_frames(waveform, frame_length, step):
     '''
@@ -16,7 +17,14 @@ def waveform_to_frames(waveform, frame_length, step):
     For every n and t such that 0 <= t*step+n <= N-1, it should be the case that 
        frames[n,t] = waveform[t*step+n]
     '''
-    raise RuntimeError("You need to change this part")
+    N = len(waveform)
+    num_frames = int((N - frame_length) / step) + 1
+    frames = np.zeros((frame_length, num_frames))
+
+    for t in range(num_frames):
+        frames[:, t] = waveform[t * step : t * step + frame_length]
+
+    return frames
 
 def frames_to_stft(frames):
     '''
@@ -26,9 +34,10 @@ def frames_to_stft(frames):
     frames (np.ndarray((frame_length, num_frames))) - the speech samples (real-valued)
     
     @returns:
-    stft (np.ndarray((frame_length,num_frames))) - the STFT (complex-valued)
+    stft (np.ndarray((frame_length, num_frames))) - the STFT (complex-valued)
     '''
-    raise RuntimeError("You need to change this part")
+    stft = np.fft.fft(frames, axis=0)
+    return stft
 
 def stft_to_spectrogram(stft):
     '''
@@ -37,15 +46,15 @@ def stft_to_spectrogram(stft):
     and clipped so that the lowest value is -60dB.
     
     @params:
-    stft (np.ndarray((frame_length,num_frames))) - STFT (complex-valued)
+    stft (np.ndarray((frame_length, num_frames))) - STFT (complex-valued)
     
     @returns:
-    spectrogram (np.ndarray((frame_length,num_frames)) - spectrogram (real-valued)
+    spectrogram (np.ndarray((frame_length, num_frames)) - spectrogram (real-valued)
     
     The spectrogram should be expressed in decibels (20*log10(abs(stft)).
     np.amax(spectrogram) should be 0dB.
     np.amin(spectrogram) should be no smaller than -60dB.
     '''
-    raise RuntimeError("You need to change this part")
-
-
+    spectrogram = 20 * np.log10(np.abs(stft))
+    spectrogram = np.clip(spectrogram, a_min=-60, a_max=None)
+    return spectrogram
