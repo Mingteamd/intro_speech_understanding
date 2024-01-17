@@ -16,5 +16,15 @@ def fourier_synthesis(num_harmonics, X, T0):
     
     x[n] = (2/N) * sum_{l=1}^{num_harmonics} |X[l*N//T0]| * cos(2*pi*l*n/T0 + angle(X[l*N//T0]))
     '''
-    raise RuntimeError("You need to change this part")
+    N = len(X)
+    x = np.zeros(N, dtype=np.complex128)
+    
+    for l in range(1, num_harmonics + 1):
+        index = l * N // T0
+        magnitude = np.abs(X[index])
+        phase = np.angle(X[index])
+        for n in range(N):
+            x[n] += (2 / N) * magnitude * np.cos(2 * np.pi * l * n / T0 + phase)
+    
+    return x.real  # Take the real part to get the waveform
 
