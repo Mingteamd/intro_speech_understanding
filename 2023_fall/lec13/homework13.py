@@ -1,4 +1,5 @@
-import bs4, gtts
+import bs4
+from gtts import gTTS
 
 def extract_stories_from_NPR_text(text):
     '''
@@ -12,9 +13,22 @@ def extract_stories_from_NPR_text(text):
       Each story should be a tuple of (title, teaser), where the title and teaser are
       both strings.  If the story has no teaser, its teaser should be an empty string.
     '''
-    raise RuntimeError('You need to write this part!')
+    # Parse the HTML using BeautifulSoup
+    soup = bs4.BeautifulSoup(text, 'html.parser')
+
+    # Extract the title and teaser for each story
+    stories = []
+    for story_elem in soup.find_all('div', class_='story-text'):
+        title_elem = story_elem.find('h3', class_='title')
+        teaser_elem = story_elem.find('p', class_='teaser')
+
+        title = title_elem.text.strip() if title_elem else ""
+        teaser = teaser_elem.text.strip() if teaser_elem else ""
+
+        stories.append((title, teaser))
+
     return stories
-    
+
 def read_nth_story(stories, n, filename):
     '''
     Read the n'th story from a list of stories.
@@ -26,4 +40,18 @@ def read_nth_story(stories, n, filename):
 
     Output: None
     '''
-    raise RuntimeError('You need to write this part!')
+    # Check if the requested index is within the range of the stories list
+    if 0 <= n < len(stories):
+        title, teaser = stories[n]
+
+        # Combine title and teaser if teaser is present
+        text_to_speak = f"{title}. {teaser}" if teaser else title
+
+        # Use gTTS to synthesize the audio
+        tts = gTTS(text_to_speak, lang='en')
+        tts.save(filename)
+
+        print(f"Story {n+1} saved to {filename}")
+    else:
+        print(f"Invalid story index: {n}")
+
